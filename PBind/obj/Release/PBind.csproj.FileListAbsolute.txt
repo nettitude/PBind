@@ -1,0 +1,19 @@
+C:\Users\admin\documents\visual studio 2015\Projects\PBind\PBind\bin\Release\PBind.pdb
+C:\Users\admin\documents\visual studio 2015\Projects\PBind\PBind\obj\Release\PBind.pdb
+C:\Users\admin\documents\visual studio 2015\Projects\PBind\PBind\bin\Release\PBind.exe.config
+C:\Users\admin\documents\visual studio 2015\Projects\PBind\PBind\bin\Release\PBind.exe
+C:\Users\admin\documents\visual studio 2015\Projects\PBind\PBind\obj\Release\PBind.exe
+C:\Users\admin\documents\visual studio 2015\Projects\PBind\PBind\obj\Release\PBind.csprojResolveAssemblyReference.cache
+Z:\Desktop\Pbinder\PBind\PBind\obj\Release\PBind.csprojResolveAssemblyReference.cache
+Z:\Desktop\Pbinder\PBind\PBind\obj\Release\PBind.csproj.CoreCompileInputs.cache
+Z:\Desktop\Pbinder\PBind\PBind\obj\Release\PBind.exe
+Z:\Desktop\Pbinder\PBind\PBind\obj\Release\PBind.pdb
+Z:\Desktop\Pbinder\PBind\PBind\bin\Release\PBind.exe.config
+Z:\Desktop\Pbinder\PBind\PBind\bin\Release\PBind.exe
+Z:\Desktop\Pbinder\PBind\PBind\bin\Release\PBind.pdb
+Z:\OPT\PoshC2_DLLs\PBind\PBind\PBind\bin\Release\PBind.pdb
+Z:\OPT\PoshC2_DLLs\PBind\PBind\PBind\obj\Release\PBind.csproj.CoreCompileInputs.cache
+Z:\OPT\PoshC2_DLLs\PBind\PBind\PBind\obj\Release\PBind.pdb
+Z:\OPT\PoshC2_DLLs\PBind\PBind\PBind\bin\Release\PBind.exe.config
+Z:\OPT\PoshC2_DLLs\PBind\PBind\PBind\bin\Release\PBind.exe
+Z:\OPT\PoshC2_DLLs\PBind\PBind\PBind\obj\Release\PBind.exe

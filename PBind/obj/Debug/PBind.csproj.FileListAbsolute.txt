@@ -1,0 +1,13 @@
+c:\users\admin\documents\visual studio 2015\Projects\PBind\PBind\bin\Debug\PBind.exe.config
+C:\Users\admin\documents\visual studio 2015\Projects\PBind\PBind\obj\Debug\PBind.csprojResolveAssemblyReference.cache
+C:\Users\admin\documents\visual studio 2015\Projects\PBind\PBind\bin\Debug\PBind.exe
+C:\Users\admin\documents\visual studio 2015\Projects\PBind\PBind\bin\Debug\PBind.pdb
+C:\Users\admin\documents\visual studio 2015\Projects\PBind\PBind\obj\Debug\PBind.exe
+C:\Users\admin\documents\visual studio 2015\Projects\PBind\PBind\obj\Debug\PBind.pdb
+Z:\Desktop\Pbinder\PBind\PBind\bin\Debug\PBind.exe.config
+Z:\Desktop\Pbinder\PBind\PBind\bin\Debug\PBind.exe
+Z:\Desktop\Pbinder\PBind\PBind\bin\Debug\PBind.pdb
+Z:\Desktop\Pbinder\PBind\PBind\obj\Debug\PBind.csproj.CoreCompileInputs.cache
+Z:\Desktop\Pbinder\PBind\PBind\obj\Debug\PBind.exe
+Z:\Desktop\Pbinder\PBind\PBind\obj\Debug\PBind.pdb
+Z:\Desktop\Pbinder\PBind\PBind\obj\Debug\PBind.csprojResolveAssemblyReference.cache
