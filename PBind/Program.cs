@@ -184,7 +184,7 @@ public class PBind
                 }
 
                 line = pipeReader.ReadLine();
-                if(!line == null)
+                if(line != null)
                 {
                     input = Decrypt(encryptionKey, line);
                 }
