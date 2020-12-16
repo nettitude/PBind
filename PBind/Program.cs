@@ -61,8 +61,7 @@ public class PBind
             string command = null;
             if (args[0].StartsWith("loadmodule"))
             {
-                byte[] data = Convert.FromBase64String(args[0].Replace("loadmodule", ""));
-                command = Encoding.UTF8.GetString(data);
+                command = args[0];
             } else {
                 byte[] data = Convert.FromBase64String(args[0]);
                 command = Encoding.UTF8.GetString(data);
