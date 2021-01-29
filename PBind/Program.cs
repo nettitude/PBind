@@ -59,7 +59,7 @@ public class PBind
         else if (pbindConnected)
         {
             string command = null;
-            if (args[0].StartsWith("loadmodule"))
+            if (args[0].StartsWith("loadmodule") || args[0].StartsWith("kill-implant"))
             {
                 command = args[0];
             } else {
