@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO.Pipes;
 using System.IO;
 using System.Text;
@@ -37,11 +38,11 @@ public static class PBind
         }
         catch (Exception e)
         {
-            Console.WriteLine($"PBind error: {e}");
+            Console.WriteLine($"PBind error: \n{e}");
         }
     }
 
-    private static void HandleCommand(string[] args)
+    private static void HandleCommand(IReadOnlyList<string> args)
     {
         var taskIdAndCommand = args[0].Trim();
         var taskId = taskIdAndCommand.Substring(0, 5);

@@ -15,11 +15,11 @@ internal static class Utils
     {
         if (trimText.Length > 200 && !verbose)
         {
-            Console.WriteLine($"{message}{trimText.Substring(0, 200)}...");
+            Console.WriteLine($"{message}\n{trimText.Substring(0, 200)}...");
         }
         else
         {
-            Console.WriteLine($"{message}{trimText}");
+            Console.WriteLine($"{message}\n{trimText}");
         }
     }
 #endif
