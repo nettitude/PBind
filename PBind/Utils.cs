@@ -1,13 +1,28 @@
 ﻿using System;
+using System.IO;
+using System.IO.Compression;
 
 internal static class Utils
 {
     internal static byte[] CombineArrays(byte[] first, byte[] second)
     {
-        var ret = new byte[first.Length + second.Length];
-        Buffer.BlockCopy(first, 0, ret, 0, first.Length);
-        Buffer.BlockCopy(second, 0, ret, first.Length, second.Length);
-        return ret;
+        var combined = new byte[first.Length + second.Length];
+        Buffer.BlockCopy(first, 0, combined, 0, first.Length);
+        Buffer.BlockCopy(second, 0, combined, first.Length, second.Length);
+        return combined;
+    }
+    
+    internal static byte[] Compress(byte[] raw)
+    {
+        using (var memory = new MemoryStream())
+        {
+            using (var gzip = new GZipStream(memory, CompressionMode.Compress, true))
+            {
+                gzip.Write(raw, 0, raw.Length);
+            }
+
+            return memory.ToArray();
+        }
     }
 
 #if DEBUG

@@ -1,61 +1,64 @@
 ﻿using System;
-using System.IO;
-using System.IO.Compression;
-using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 
 internal static class Encryption
 {
-    internal static string Encrypt(string key, string un, bool comp = false, byte[] unByte = null)
+    internal static string Encrypt(string key, string plaintext, bool gzip = false)
     {
-        var byEnc = unByte ?? Encoding.UTF8.GetBytes(un);
+        return Encrypt(key, Encoding.UTF8.GetBytes(plaintext), gzip);
+    }
 
-        if (comp)
-            byEnc = GzipCompress(byEnc);
+    internal static string Encrypt(string key, byte[] plaintext, bool gzip = false)
+    {
+        if (gzip)
+            plaintext = Utils.Compress(plaintext);
 
         try
         {
-            var a = CreateEncryptionAlgorithm(key, null);
-            var f = a.CreateEncryptor().TransformFinalBlock(byEnc, 0, byEnc.Length);
-            return Convert.ToBase64String(Utils.CombineArrays(a.IV, f));
+            var algorithm = CreateAlgorithm(key, null);
+            var cipherText = algorithm.CreateEncryptor().TransformFinalBlock(plaintext, 0, plaintext.Length);
+            return Convert.ToBase64String(Utils.CombineArrays(algorithm.IV, cipherText));
         }
         catch
         {
-            var a = CreateEncryptionAlgorithm(key, null, false);
-            var f = a.CreateEncryptor().TransformFinalBlock(byEnc, 0, byEnc.Length);
-            return Convert.ToBase64String(Utils.CombineArrays(a.IV, f));
+            var cipher = CreateAlgorithm(key, null, false);
+            var cipherText = cipher.CreateEncryptor().TransformFinalBlock(plaintext, 0, plaintext.Length);
+            return Convert.ToBase64String(Utils.CombineArrays(cipher.IV, cipherText));
         }
     }
 
-    internal static string Decrypt(string key, string ciphertext)
+    private static byte[] Decrypt(string key, byte[] ciphertext)
     {
-        var rawCipherText = Convert.FromBase64String(ciphertext);
         var iv = new byte[16];
-        Array.Copy(rawCipherText, iv, 16);
+        Array.Copy(ciphertext, iv, 16);
         try
         {
-            var algorithm = Encryption.CreateEncryptionAlgorithm(key, Convert.ToBase64String(iv));
-            var decrypted = algorithm.CreateDecryptor().TransformFinalBlock(rawCipherText, 16, rawCipherText.Length - 16);
-            return Encoding.UTF8.GetString(decrypted.Where(x => x > 0).ToArray());
+            var cipher = CreateAlgorithm(key, Convert.ToBase64String(iv));
+            return cipher.CreateDecryptor().TransformFinalBlock(ciphertext, 16, ciphertext.Length - 16);
         }
         catch
         {
-            var algorithm = Encryption.CreateEncryptionAlgorithm(key, Convert.ToBase64String(iv), false);
-            var decrypted = algorithm.CreateDecryptor().TransformFinalBlock(rawCipherText, 16, rawCipherText.Length - 16);
-            return Encoding.UTF8.GetString(decrypted.Where(x => x > 0).ToArray());
+            var cipher = CreateAlgorithm(key, Convert.ToBase64String(iv), false);
+            return cipher.CreateDecryptor().TransformFinalBlock(ciphertext, 16, ciphertext.Length - 16);
         }
         finally
         {
-            Array.Clear(rawCipherText, 0, rawCipherText.Length);
+            Array.Clear(ciphertext, 0, ciphertext.Length);
             Array.Clear(iv, 0, 16);
         }
     }
 
-    private static SymmetricAlgorithm CreateEncryptionAlgorithm(string key, string iv, bool rij = true)
+    internal static byte[] Decrypt(string key, string base64EncodedCiphertext)
+    {
+        var ciphertext = Convert.FromBase64String(base64EncodedCiphertext);
+        return Decrypt(key, ciphertext);
+    }
+
+    private static SymmetricAlgorithm CreateAlgorithm(string key, string iv, bool useRijndael = true)
     {
         SymmetricAlgorithm algorithm;
-        if (rij)
+        if (useRijndael)
             algorithm = new RijndaelManaged();
         else
             algorithm = new AesCryptoServiceProvider();
@@ -74,18 +77,5 @@ internal static class Encryption
             algorithm.Key = Convert.FromBase64String(key);
 
         return algorithm;
-    }
-
-    private static byte[] GzipCompress(byte[] raw)
-    {
-        using (var memory = new MemoryStream())
-        {
-            using (var gzip = new GZipStream(memory, CompressionMode.Compress, true))
-            {
-                gzip.Write(raw, 0, raw.Length);
-            }
-
-            return memory.ToArray();
-        }
     }
 }
